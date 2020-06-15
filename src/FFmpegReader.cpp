@@ -1160,10 +1160,14 @@ bool FFmpegReader::GetAVFrame() {
 				// TODO also handle possible further frames
 				// Use only the first frame like avcodec_decode_video2
 				if (frameFinished == 0 ) {
+					if (next_frame->width < info.width) {
+						info.width = next_frame->width;
+						info.height = next_frame->height;
+					}
 					frameFinished = 1;
-					av_image_alloc(pFrame->data, pFrame->linesize, info.width, info.height, (AVPixelFormat)(pStream->codecpar->format), 32);
+					av_image_alloc(pFrame->data, pFrame->linesize, next_frame->width, next_frame->height, (AVPixelFormat)(pStream->codecpar->format), 32);
 					av_image_copy(pFrame->data, pFrame->linesize, (const uint8_t**)next_frame->data, next_frame->linesize,
-												(AVPixelFormat)(pStream->codecpar->format), info.width, info.height);
+												(AVPixelFormat)(pStream->codecpar->format), next_frame->width, next_frame->height);
 				}
 			}
 	#if HAVE_HW_ACCEL
