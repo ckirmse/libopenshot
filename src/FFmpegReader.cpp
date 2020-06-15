@@ -96,9 +96,7 @@ FFmpegReader::FFmpegReader(std::string path)
 	AVCODEC_REGISTER_ALL
 
 	// Init cache
-	working_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * info.fps.ToDouble() * 2, info.width, info.height, info.sample_rate, info.channels);
-	missing_frames.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
-	final_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
+      UpdateCacheSizes();
 
 	// Open and Close the reader, to populate its attributes (such as height, width, etc...)
 	Open();
@@ -118,9 +116,7 @@ FFmpegReader::FFmpegReader(std::string path, bool inspect_reader)
 	AVCODEC_REGISTER_ALL
 
 	// Init cache
-	working_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * info.fps.ToDouble() * 2, info.width, info.height, info.sample_rate, info.channels);
-	missing_frames.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
-	final_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
+      UpdateCacheSizes();
 
 	// Open and Close the reader, to populate its attributes (such as height, width, etc...)
 	if (inspect_reader) {
@@ -559,19 +555,43 @@ void FFmpegReader::Open() {
 			QString str_value = tag->value;
 			info.metadata[str_key.toStdString()] = str_value.trimmed().toStdString();
 		}
+    UpdateCacheSizes();
 
 		// Init previous audio location to zero
 		previous_packet_location.frame = -1;
 		previous_packet_location.sample_start = 0;
 
 		// Adjust cache size based on size of frame and audio
-		working_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * info.fps.ToDouble() * 2, info.width, info.height, info.sample_rate, info.channels);
-		missing_frames.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
-		final_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
+      UpdateCacheSizes();
 
 		// Mark as "open"
 		is_open = true;
 	}
+}
+
+void FFmpegReader::SetCacheSizes(int64_t working_cache_bytes, int64_t missing_cache_bytes, int64_t final_cache_bytes) {
+       this->working_cache_bytes = working_cache_bytes;
+       this->missing_cache_bytes = missing_cache_bytes;
+       this->final_cache_bytes = final_cache_bytes;
+       UpdateCacheSizes();
+}
+
+void FFmpegReader::UpdateCacheSizes() {
+       if (working_cache_bytes == -1) {
+           working_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
+       } else {
+           working_cache.SetMaxBytes(working_cache_bytes);
+       }
+       if (missing_cache_bytes == -1) {
+           missing_frames.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * 2, info.width, info.height, info.sample_rate, info.channels);
+       } else {
+           missing_frames.SetMaxBytes(missing_cache_bytes);
+       }
+       if (final_cache_bytes == -1) {
+           final_cache.SetMaxBytesFromInfo(OPEN_MP_NUM_PROCESSORS * info.fps.ToDouble() * 2, info.width, info.height, info.sample_rate, info.channels);
+       } else {
+           final_cache.SetMaxBytes(final_cache_bytes);
+       }
 }
 
 void FFmpegReader::Close() {

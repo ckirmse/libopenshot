@@ -110,8 +110,12 @@ namespace openshot {
 		bool check_fps;
 		bool has_missing_frames;
 
+		// -1 will be 2 seconds of frames times OPEN_MP_NUM_PROCESSORS
+      int64_t final_cache_bytes = -1;
 		CacheMemory working_cache;
+      int working_cache_bytes = -1;
 		CacheMemory missing_frames;
+      int missing_cache_bytes = -1;
 		std::map<int64_t, int64_t> processing_video_frames;
 		std::multimap<int64_t, int64_t> processing_audio_frames;
 		std::map<int64_t, int64_t> processed_video_frames;
@@ -122,6 +126,7 @@ namespace openshot {
 		std::multimap<int64_t, int64_t> missing_audio_frames_source;
 		std::map<int64_t, int> checked_frames;
 		AudioLocation previous_packet_location;
+      void UpdateCacheSizes();
 
 		// DEBUG VARIABLES (FOR AUDIO ISSUES)
 		int prev_samples;
@@ -250,6 +255,8 @@ namespace openshot {
 
 		/// Get the cache object used by this reader
 		CacheMemory *GetCache() override { return &final_cache; };
+      void SetCacheSizes(int64_t working_cache_bytes, int64_t missing_cache_bytes, int64_t final_cache_bytes);
+
 
 		/// Get a shared pointer to a openshot::Frame object for a specific frame number of this reader.
 		///
