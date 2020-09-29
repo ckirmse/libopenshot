@@ -1369,6 +1369,8 @@ void FFmpegReader::ProcessVideoPacket(int64_t requested_frame) {
 			}
 		}
 
+		width += width % 4;
+
 		// Determine required buffer size and allocate buffer
 		numBytes = AV_GET_IMAGE_SIZE(PIX_FMT_RGBA, width, height);
 
