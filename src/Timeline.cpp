@@ -33,11 +33,13 @@
 using namespace openshot;
 
 // Default Constructor for the timeline (which sets the canvas width and height)
-Timeline::Timeline(int width, int height, Fraction fps, int sample_rate, int channels, ChannelLayout channel_layout) :
+Timeline::Timeline(int width, int height, Fraction fps, int sample_rate, int channels, ChannelLayout channel_layout, bool disable_crash_handler) :
 		is_open(false), auto_map_clips(true), managed_cache(true), path("")
 {
-	// Create CrashHandler and Attach (incase of errors)
-	CrashHandler::Instance();
+	if (!disable_crash_handler) {
+		// Create CrashHandler and Attach (incase of errors)
+		CrashHandler::Instance();
+	}
 
 	// Init viewport size (curve based, because it can be animated)
 	viewport_scale = Keyframe(100.0);
@@ -76,11 +78,13 @@ Timeline::Timeline(int width, int height, Fraction fps, int sample_rate, int cha
 }
 
 // Constructor for the timeline (which loads a JSON structure from a file path, and initializes a timeline)
-Timeline::Timeline(std::string projectPath, bool convert_absolute_paths) :
+Timeline::Timeline(std::string projectPath, bool convert_absolute_paths, bool disable_crash_handler) :
 		is_open(false), auto_map_clips(true), managed_cache(true), path(projectPath) {
 
-	// Create CrashHandler and Attach (incase of errors)
-	CrashHandler::Instance();
+	if (!disable_crash_handler) {
+		// Create CrashHandler and Attach (incase of errors)
+		CrashHandler::Instance();
+	}
 
 	// Init final cache as NULL (will be created after loading json)
 	final_cache = NULL;
