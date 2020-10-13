@@ -225,7 +225,7 @@ namespace openshot {
 		/// @param channels The number of audio channels of the timeline
 		/// @param channel_layout The channel layout (i.e. mono, stereo, 3 point surround, etc...)
 		/// @param disable_crash_handler if false a CrashHandler instance is created
-		Timeline(int width, int height, openshot::Fraction fps, int sample_rate, int channels, openshot::ChannelLayout channel_layout, bool disable_crash_handler = f alse);
+		Timeline(int width, int height, openshot::Fraction fps, int sample_rate, int channels, openshot::ChannelLayout channel_layout, bool disable_crash_handler = false);
 
 		/// @brief Constructor for the timeline (which loads a JSON structure from a file path, and initializes a timeline)
 		/// @param projectPath The path of the UTF-8 *.osp project file (JSON contents). Contents will be loaded automatically.
