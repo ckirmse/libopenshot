@@ -1182,7 +1182,7 @@ bool FFmpegReader::GetAVFrame() {
 						info.height = next_frame->height;
 					}
 					frameFinished = 1;
-					av_image_alloc(pFrame->data, pFrame->linesize, next_frame->width, next_frame->height, (AVPixelFormat)(pStream->codecpar->format), 1);
+					av_image_alloc(pFrame->data, pFrame->linesize, next_frame->width, next_frame->height, (AVPixelFormat)(pStream->codecpar->format), 32);
 					av_image_copy(pFrame->data, pFrame->linesize, (const uint8_t**)next_frame->data, next_frame->linesize,
 												(AVPixelFormat)(pStream->codecpar->format), next_frame->width, next_frame->height);
 				}
@@ -1369,8 +1369,6 @@ void FFmpegReader::ProcessVideoPacket(int64_t requested_frame) {
 			}
 		}
 
-		width += (4 - (width % 4)) % 4;
-
 		// Determine required buffer size and allocate buffer
 		numBytes = AV_GET_IMAGE_SIZE(PIX_FMT_RGBA, width, height);
 
@@ -1395,7 +1393,7 @@ void FFmpegReader::ProcessVideoPacket(int64_t requested_frame) {
 		std::shared_ptr<Frame> f = CreateFrame(current_frame);
 
 		// Add Image data to frame
-		f->AddImage(width, height, 4, QImage::Format_RGBA8888, buffer);
+		f->AddImage(width, height, 4, pFrameRGB->linesize[0], QImage::Format_RGBA8888, buffer);
 
 		// Update working cache
 		working_cache.Add(f);
