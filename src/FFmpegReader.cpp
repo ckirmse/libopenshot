@@ -1376,7 +1376,7 @@ void FFmpegReader::ProcessVideoPacket(int64_t requested_frame) {
 		numBytes = AV_GET_IMAGE_SIZE(PIX_FMT_RGBA, width, height);
 
 #pragma omp critical (video_buffer)
-		buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+		buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t) + 32); // av_image_alloc does this same addition of the alignment
 
 		// Copy picture data from one AVFrame (or AVPicture) to another one.
 		AV_COPY_PICTURE_DATA(pFrameRGB, buffer, PIX_FMT_RGBA, width, height);
