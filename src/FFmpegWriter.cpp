@@ -978,7 +978,7 @@ void FFmpegWriter::flush_encoders() {
 
 			// Since the PTS can change during encoding, set the value again.  This seems like a huge hack,
 			// but it fixes lots of PTS related issues when I do this.
-			pkt.pts = pkt.dts = write_audio_count;
+			//pkt.pts = pkt.dts = write_audio_count;
 
 			// Scale the PTS to the audio stream timebase (which is sometimes different than the codec's timebase)
 			if (pkt.pts != AV_NOPTS_VALUE)
@@ -1901,7 +1901,7 @@ void FFmpegWriter::write_audio_packets(bool is_final) {
 
 				// Since the PTS can change during encoding, set the value again.  This seems like a huge hack,
 				// but it fixes lots of PTS related issues when I do this.
-				pkt.pts = pkt.dts = write_audio_count;
+				//pkt.pts = pkt.dts = write_audio_count;
 
 				// Scale the PTS to the audio stream timebase (which is sometimes different than the codec's timebase)
 				if (pkt.pts != AV_NOPTS_VALUE)
